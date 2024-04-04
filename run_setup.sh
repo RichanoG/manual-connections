@@ -451,20 +451,21 @@ if ! command -v resolvconf &>/dev/null && [[ $VPN_PROTOCOL == "wireguard" ]]; th
 fi
 
 # Check for in-line definition of PIA_DNS and prompt for input
-if [[ $setDNS == "yes" ]]; then
+if [[ $setDNS == "-----" ]]; then
   if [[ -z $PIA_DNS ]]; then
     echo "Using third party DNS could allow DNS monitoring."
     echo -n "Do you want to force PIA DNS ([Y]es/[n]o): "
     read -r setDNS
     echo
     PIA_DNS="true"
-    if echo "${setDNS:0:1}" | grep -iq n; then
-      PIA_DNS="false"
-    fi
+    #if echo "${setDNS:0:1}" | grep -iq n; then
+    #  PIA_DNS="false"
+    #fi
   fi
 elif [[ $PIA_DNS != "true" || $setDNS == "no" ]]; then
-  PIA_DNS="false"
+  #PIA_DNS="false"
 fi
+PIA_DNS="true"
 export PIA_DNS
 echo -e "${green}PIA_DNS=$PIA_DNS${nc}"
 
