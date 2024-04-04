@@ -462,7 +462,7 @@ if [[ $setDNS == "-----" ]]; then
     #  PIA_DNS="false"
     #fi
   fi
-elif [[ $PIA_DNS != "true" || $setDNS == "no" ]]; then
+#elif [[ $PIA_DNS != "true" || $setDNS == "no" ]]; then
   #PIA_DNS="false"
 fi
 PIA_DNS="true"
