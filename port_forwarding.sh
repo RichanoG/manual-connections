@@ -128,6 +128,22 @@ Trying to bind the port... "
 
 echo "[CUSTOM] Attempting to copy resolv.conf ..."
 cp --force /resolv.conf /etc/resolv.conf
+echo "[CUSTOM] Attempting to post port to 172.69.11.1 ..."
+
+# URL of the API endpoint
+CUSTOM_API_URL="http://172.69.11.1:8067/api/ports/port"
+
+# Make the POST request with curl and capture the HTTP status code
+http_status=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$CUSTOM_API_URL" \
+                -H "Content-Type: application/json" \
+                -d "{\"port\": $port}")
+
+# Check if the HTTP status code indicates success (2xx range)
+if [[ $http_status -ge 200 && $http_status -lt 300 ]]; then
+    echo "[CUSTOM] Success: Posted the new port. HTTP Status Code: $http_status"
+else
+    echo "[CUSTOM] Failure: The post request failed. HTTP Status Code: $http_status"
+fi
 
 # Now we have all required data to create a request to bind the port.
 # We will repeat this request every 15 minutes, in order to keep the port
