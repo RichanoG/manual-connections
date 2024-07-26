@@ -487,6 +487,7 @@ elif [[ $VPN_PROTOCOL == wireguard ]]; then
     WG_SERVER_IP=$dipAddress WG_HOSTNAME=$dipHostname \
     ./connect_to_wireguard_with_token.sh
   rm -f /opt/piavpn-manual/latencyList
+  cp --force /resolv.conf /etc/resolv.conf
   exit 0
 elif [[ $VPN_PROTOCOL == openvpn* ]]; then
   echo
