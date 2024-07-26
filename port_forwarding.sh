@@ -126,6 +126,9 @@ Payload   ${green}$payload${nc}
 
 Trying to bind the port... "
 
+echo "[CUSTOM] Attempting to copy resolv.conf ..."
+cp --force /resolv.conf /etc/resolv.conf
+
 # Now we have all required data to create a request to bind the port.
 # We will repeat this request every 15 minutes, in order to keep the port
 # alive. The servers have no mechanism to track your activity, so they
