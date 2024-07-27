@@ -136,7 +136,7 @@ CUSTOM_API_URL="http://172.69.11.1:8067/api/ports/port"
 # Make the POST request with curl and capture the HTTP status code
 http_status=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$CUSTOM_API_URL" \
                 -H "Content-Type: application/json" \
-                -d "{\"port\": $port}")
+                -d "{\"port\": \"$port\"}")
 
 # Check if the HTTP status code indicates success (2xx range)
 if [[ $http_status -ge 200 && $http_status -lt 300 ]]; then
