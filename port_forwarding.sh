@@ -33,6 +33,22 @@ check_tool() {
 check_tool curl
 check_tool jq
 
+# Ensure iproute2 is installed
+if ! command -v ip >/dev/null; then
+  echo "[SETUP] Installing iproute2..."
+
+  if command -v apt-get >/dev/null; then
+    apt-get update && apt-get install -y iproute2
+  elif command -v apk >/dev/null; then
+    apk add --no-cache iproute2
+  elif command -v yum >/dev/null; then
+    yum install -y iproute
+  else
+    echo "[ERROR] No supported package manager found to install iproute2"
+    exit 1
+  fi
+fi
+
 # Check if the mandatory environment variables are set.
 if [[ -z $PF_GATEWAY || -z $PIA_TOKEN || -z $PF_HOSTNAME ]]; then
   echo "This script requires 3 env vars:"
@@ -126,12 +142,32 @@ Payload   ${green}$payload${nc}
 
 Trying to bind the port... "
 
+echo "[CUSTOM] Fixing host.docker.internal route to Docker host..."
+
+# Resolve host.docker.internal to IP
+HOST_DOCKER_IP=$(getent hosts host.docker.internal | awk '{print $1}')
+
+if [[ -z "$HOST_DOCKER_IP" ]]; then
+  echo "[ERROR] Could not resolve host.docker.internal"
+  exit 1
+fi
+
+echo "[CUSTOM] host.docker.internal resolved to $HOST_DOCKER_IP"
+
+# Add route if not already present
+if ! ip route | grep -q "$HOST_DOCKER_IP"; then
+  ip route add "$HOST_DOCKER_IP"/32 dev eth0
+  echo "[CUSTOM] Route added for $HOST_DOCKER_IP via eth0"
+else
+  echo "[CUSTOM] Route already exists"
+fi
+
 echo "[CUSTOM] Attempting to copy resolv.conf ..."
 cp --force /resolv.conf /etc/resolv.conf
-echo "[CUSTOM] Attempting to post port to 172.69.11.1 ..."
+echo "[CUSTOM] Attempting to post port to host.docker.internal ..."
 
 # URL of the API endpoint
-CUSTOM_API_URL="http://172.69.11.1:8067/api/ports/port"
+CUSTOM_API_URL="http://host.docker.internal:8067/api/ports/port"
 
 # Make the POST request with curl and capture the HTTP status code
 http_status=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$CUSTOM_API_URL" \
